@@ -2,43 +2,57 @@ clear all
 close all
 clc
 
+MIN_RANK = 2;
+MAX_RANK = 12;
+
 c=1;
 
 p1 =@(k,e) (k^4)*(c^-3)*(e^-3);
 p2 =@(k,e) (k^2)*(c^-3)*(e^-4);
-p3 =@(k,e) max((k^4)*(c^-3)*(e^-3), (k^2)*(c^-3)*(e^-4));
+p3 =@(k,e) (10^7)*max(p1(k,e), p2(k,e));
 
-% figure(1)
-% hold on
-% figure(2)
-% hold on
-figure(3)
-hold on
-for e=0.1:0.05:1
-    disp(e)
-    for k=1:5:30
-%         figure(1)
-%         plot(e,p1(k,e),'r.')
-%         plot(e,p2(k,e),'b.')
-%         figure(2)
-%         plot(k,p1(k,e),'r.')
-%         plot(k,p2(k,e),'b.')
-        figure(3)
-        scatter3(e,k,k/(c*e),'g.')
+cmap = hsv(MAX_RANK-MIN_RANK+1); 
+
+
+for mat_rank=MIN_RANK:MAX_RANK
+    min_k = inf;
+    max_k = -inf;
+    min_e = inf;
+    max_e = -inf;
+    
+    E = [];
+    K = [];
+    C = [];
+    e1 = [0.0001:0.0001:1,1:10000];
+    for k=1:mat_rank
+        for e=e1
+            p = p3(k,e);
+            if p <= mat_rank && k <= p
+%                 disp('HERE2')
+                if min_k > k
+                    min_k = k;
+                end
+                if max_k < k
+                    max_k = k;
+                end
+                if min_e > e
+                    min_e = e;
+                end
+                if max_e < e
+                    max_e = e;
+                end
+                E = [E;e];
+                K = [K;k];
+                C = [C;cmap(mat_rank-1,:)];
+            end
+        end
     end
+    figure()
+    scatter(E,K,2,'r');
+    xlabel('e')
+    ylabel('k')
+    title(sprintf('Rank %d',mat_rank))
+%     disp('HERE3')
+    fprintf('Rank %d, E: {%d,%d}, K: {%d,%d}\n',mat_rank,min_e,max_e,min_k,max_k)
+    saveas(gca,sprintf('k_e_p_rank_%d.png',mat_rank))
 end
-% figure(1)
-% xlabel('e')
-% ylabel('p')
-% set(gca, 'YScale', 'log')
-% figure(2)
-% xlabel('k')
-% ylabel('p')
-% set(gca, 'YScale', 'log')
-figure(3)
-xlabel('e')
-ylabel('k')
-% set(gca, 'ZScale', 'log')
-view(40,35)
-% legend(['p1','p2','p'])
-% sh

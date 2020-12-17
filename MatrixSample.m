@@ -10,8 +10,9 @@ end
 Frobenius = sum(B.*B,'all');
 cFrob = c/Frobenius;
 
-disp(p)
-p = min(m,p);
+% disp(p)
+% p = min(m,p);
+assert(p <= m)
 
 P_min = zeros(m,1);
 for i=1:m
@@ -25,7 +26,7 @@ S = zeros(p,n);
 
 for i=1:p
     ti = randsample(m,1,true,P_min);
-    S(i,:) = B(ti,:)/sqrt(p*P_min(i));
+    S(i,:) = B(ti,:)/sqrt(double(p)*P_min(i));
 end
 
 if nargin == 2 && strcmp(args,'cols')
@@ -35,6 +36,6 @@ end
 af = Frobenius;
 sf = sum(S.*S,'all');
 assert(0.5*af <= sf,'.5*A frob is > S frob')
-disp(sf)
-disp(1.5*af)
+% disp(sf)
+% disp(1.5*af)
 assert(sf <= 1.5*af,'S frob is > 1.5*A frob')
